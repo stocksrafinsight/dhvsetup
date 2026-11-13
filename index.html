@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Dhishuum folder setup</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0;font-family:Arial;background:#ffd400;display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column}
+button{font-size:40px;padding:30px 60px;border:0;border-radius:20px;background:#111;color:#fff;cursor:pointer}#s{margin-top:30px;font-size:24px}</style></head>
+<body><button id="b">CLICK HERE</button><div id="s">waiting</div>
+<script>
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('dhvfs',1);r.onupgradeneeded=()=>r.result.createObjectStore('h');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function save(h){const db=await idb();await new Promise(r=>{const t=db.transaction('h','readwrite');t.objectStore('h').put(h,'downloads');t.oncomplete=r})}
+async function load(){const db=await idb();return new Promise(r=>{const q=db.transaction('h').objectStore('h').get('downloads');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})}
+const S=document.getElementById('s');window.__fs={status:'waiting'};
+function st(x){S.textContent=x;window.__fs.status=x}
+document.getElementById('b').onclick=async()=>{st('picker open');try{const h=await showDirectoryPicker({id:'dhvdl',mode:'readwrite',startIn:'downloads'});st('picked '+h.name);const p=await h.requestPermission({mode:'readwrite'});await save(h);window.__fs.h=h;st('OK '+h.name+' '+p+' - all done, you can close this tab')}catch(e){st('err '+e.name+' '+e.message)}};
+window.__load=load;
+</script></body></html>
